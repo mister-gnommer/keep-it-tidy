@@ -1,0 +1,44 @@
+# keep-it-tidy configuration
+# Copy this file to config.toml and edit it — config.toml is gitignored.
+
+# Absolute paths to directories to watch
+directories = ["/home/user/Downloads"]
+
+# Items whose name contains any of these strings are fully skipped,
+# including during recursive date scanning of parent directories.
+# Leave as empty list to disable.
+ignore-pattern = [".git", "node_modules"]
+
+# Items whose name contains any of these strings are flagged as "removable".
+removable-pattern = ["_!tmp"]
+
+# Set to false to never permanently delete anything.
+# Items will be moved to _safe-to-remove/ instead.
+danger-enable-removing = true
+
+# Set to true to make a dry run: no filesystem changes are made.
+# A markdown report is written to the first watched directory instead.
+dry-run = false
+
+# Days since last modification before a removable item is moved to _to-remove/
+removable-main-sweep-ttl = 7
+
+# Days an item must sit in _to-remove/ before being deleted
+removable-remove-after = 14
+
+# Days since last modification before a standard item is moved to _auto-arch/
+arch-main-sweep-ttl = 60
+
+# Set to true to move old standard items to _auto-arch/
+enable-auto-arch = false
+
+# Master switch: set to false to disable all removal/staging of removable items
+enable-removing = true
+
+# If true, ALL items are treated as removable regardless of removable-pattern
+remove-all = false
+
+# Max files scanned inside a directory when computing its effective date.
+# Prevents slow scanning of huge trees (e.g. node_modules even if not in ignore-pattern).
+# Falls back to the directory's own mtime if the limit is hit.
+dir-scan-file-limit = 10000
