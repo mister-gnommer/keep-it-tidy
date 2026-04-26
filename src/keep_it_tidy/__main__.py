@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import logging
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -8,7 +9,15 @@ from pathlib import Path
 from .config.config_loader import load_config
 from .pipeline.pipeline import run
 from .platform.os_guard import os_guard
+from .config.config_types import Config
 from .report.report import write_report
+
+
+def _resolve_report_dir(config: Config) -> Path:
+    if config.report_dir is not None:
+        return config.report_dir
+    xdg_data = Path(os.environ.get("XDG_DATA_HOME", "~/.local/share")).expanduser()
+    return xdg_data / "keep-it-tidy"
 
 
 def main() -> None:
@@ -38,10 +47,11 @@ def main() -> None:
 
     actions = run(config)
 
-    if config.dry_run and config.directories:
+    if config.dry_run:
         now = datetime.now()
-        first_dir = Path(config.directories[0])
-        report_path = write_report(actions, config, now, first_dir)
+        report_dir = _resolve_report_dir(config)
+        report_dir.mkdir(parents=True, exist_ok=True)
+        report_path = write_report(actions, config, now, report_dir)
         logging.info("Dry-run report written to %s", report_path)
 
 

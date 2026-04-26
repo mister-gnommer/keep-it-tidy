@@ -1,1 +1,2 @@
 - `dc8b9d50-0900-4a7a-b1a0-91b0c5ec44e5` — 2026-04-26 — pragmatic code review of entire codebase
+- `663a13d2-30b9-4d75-a0bf-bd02391e1e80` — 2026-04-26 — add AGENTS.md with Python-learner context for AI assistants

@@ -17,8 +17,12 @@ removable-pattern = ["_!tmp"]
 danger-enable-removing = true
 
 # Set to true to make a dry run: no filesystem changes are made.
-# A markdown report is written to the first watched directory instead.
+# A markdown report is written to report-dir (see below).
 dry-run = false
+
+# Directory where dry-run reports are written.
+# Defaults to $XDG_DATA_HOME/keep-it-tidy (~/.local/share/keep-it-tidy if unset).
+# report-dir = "/home/user/reports"
 
 # Days since last modification before a removable item is moved to _to-remove/
 removable-main-sweep-ttl = 7

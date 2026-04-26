@@ -18,6 +18,7 @@ class Config:
     enable_removing: bool = True
     remove_all: bool = False
     dir_scan_file_limit: int = 10000
+    report_dir: Path | None = None
 
 
 @dataclass

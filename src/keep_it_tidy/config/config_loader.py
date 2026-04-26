@@ -38,6 +38,7 @@ def load_config(path: Path) -> Config:
         enable_removing=bool(raw.get("enable-removing", True)),
         remove_all=bool(raw.get("remove-all", False)),
         dir_scan_file_limit=dir_scan_file_limit,
+        report_dir=Path(raw["report-dir"]) if "report-dir" in raw else None,
     )
 
 
