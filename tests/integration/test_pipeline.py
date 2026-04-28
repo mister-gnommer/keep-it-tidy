@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 from keep_it_tidy.config.config_types import Config
-from keep_it_tidy.pipeline.pipeline import run
+from keep_it_tidy.pipeline.pipeline import run_pipeline
 
 
 def _age(path: Path, days: int) -> None:
@@ -31,7 +31,7 @@ def test_old_removable_file_staged() -> None:
         f.write_text("x")
         _age(f, 10)
 
-        actions = run(_config(d))
+        actions = run_pipeline(_config(d))
         assert any(a.type == "stage-for-removal" for a in actions)
 
 
@@ -41,7 +41,7 @@ def test_young_removable_not_staged() -> None:
         f.write_text("x")
         _age(f, 2)
 
-        actions = run(_config(d))
+        actions = run_pipeline(_config(d))
         assert not any(a.type == "stage-for-removal" for a in actions)
 
 
@@ -51,7 +51,7 @@ def test_standard_old_file_archived_when_enabled() -> None:
         f.write_text("x")
         _age(f, 90)
 
-        actions = run(_config(d, enable_auto_arch=True))
+        actions = run_pipeline(_config(d, enable_auto_arch=True))
         assert any(a.type == "archive" for a in actions)
 
 
@@ -61,7 +61,7 @@ def test_ignored_file_not_touched() -> None:
         f.write_text("x")
         _age(f, 100)
 
-        actions = run(_config(d, ignore_pattern=["node_modules"]))
+        actions = run_pipeline(_config(d, ignore_pattern=["node_modules"]))
         paths = [str(a.source_path) for a in actions]
         assert not any("node_modules" in p for p in paths)
 
@@ -74,7 +74,7 @@ def test_staged_old_item_deleted() -> None:
         entry = staging / f"{old_date}_old_file.txt"
         entry.write_text("x")
 
-        actions = run(_config(d))
+        actions = run_pipeline(_config(d))
         assert any(a.type == "delete" for a in actions)
 
 
@@ -84,6 +84,6 @@ def test_dry_run_makes_no_filesystem_changes() -> None:
         f.write_text("x")
         _age(f, 10)
 
-        run(_config(d))
+        run_pipeline(_config(d))
 
         assert f.exists(), "File should not be moved in dry_run mode"
