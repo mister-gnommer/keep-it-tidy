@@ -1,5 +1,5 @@
 > **⚠ AI-generated code — not yet human-reviewed. Use at your own risk.**
-> This project was scaffolded by an AI agent. The logic has not been audited by a human.
+> This project was scaffolded by an AI agent. The logic has not been audited by a human (in fact this is happening right now ;)).
 > Do not run against important directories without first testing with `dry-run = true`.
 
 ---
@@ -132,3 +132,7 @@ src/keep_it_tidy/
 ├── fs/                  # sole module allowed to mutate the filesystem
 └── report/              # dry-run markdown report generator
 ```
+
+## TODOs
+
+- human review (`__main__` and `pipeline` done)
