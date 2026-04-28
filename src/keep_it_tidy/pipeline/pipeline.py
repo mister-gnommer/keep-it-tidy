@@ -1,5 +1,3 @@
-import logging
-import os
 from datetime import datetime
 from pathlib import Path
 
@@ -13,16 +11,9 @@ from .stage_main_sweep import plan as plan_main_sweep
 from .stage_to_remove import plan as plan_to_remove
 
 
-def _resolve_report_dir(config: Config) -> Path:
-    if config.report_dir is not None:
-        return config.report_dir
-    xdg_data = Path(os.environ.get("XDG_DATA_HOME", "~/.local/share")).expanduser()
-    return xdg_data / "keep-it-tidy"
-
-
 def run_pipeline(config: Config) -> list[PipelineAction]:
     now = datetime.now()
-    all_actions: list[PipelineAction] = []
+    actions_from_all_dirs: list[PipelineAction] = []
 
     for dir_str in config.directories:
         watched_dir = Path(dir_str)
@@ -38,12 +29,11 @@ def run_pipeline(config: Config) -> list[PipelineAction]:
         stage_actions.extend(plan_auto_arch(classified, config, watched_dir))
 
         execute_pipeline_actions(stage_actions, config)
-        all_actions.extend(stage_actions)
+        actions_from_all_dirs.extend(stage_actions)
 
-    if config.dry_run:
-        report_dir = _resolve_report_dir(config)
-        report_dir.mkdir(parents=True, exist_ok=True)
-        report_path = write_report(all_actions, config, now, report_dir)
-        logging.info("Dry-run report written to %s", report_path)
+    write_report(actions_from_all_dirs, config, now)
 
-    return all_actions
+    # Returned for integration tests; __main__ does not use this value.
+    # Prefer keeping it over restructuring tests — it also leaves the door open
+    # for future callers (e.g. a --summary flag or non-zero exit on actions taken).
+    return actions_from_all_dirs

@@ -17,7 +17,7 @@ removable-pattern = ["_!tmp"]
 danger-enable-removing = true
 
 # Set to true to make a dry run: no filesystem changes are made.
-# A markdown report is written to report-dir (see below).
+# A markdown report is always written after each run (see report-dir below).
 dry-run = false
 
 # Directory where dry-run reports are written.
