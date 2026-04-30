@@ -21,14 +21,17 @@ def execute_pipeline_actions(actions: list[PipelineAction], config: Config) -> N
             _ensure_parent(action)
             shutil.move(str(action.source_path), str(action.target_path))
 
-        elif action.type == "move-to-safe":
-            _ensure_parent(action)
-            shutil.move(str(action.source_path), str(action.target_path))
-
         elif action.type == "delete":
-            # SINGLE DELETION POINT — enforced by tests/unit/test_single_deletion_point.py
-            # dry_run is guaranteed False: the continue above skips this entire block otherwise
-            shutil.rmtree(action.source_path)
+            if not config.danger_enable_removing:
+                # SINGLE DELETION POINT — enforced by tests/unit/test_single_deletion_point.py
+                # dry_run is guaranteed False: the continue above skips this entire block otherwise
+                safe_dir = action.source_path.parent.parent / "_safe-to-remove"
+                target = safe_dir / action.source_path.name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                logger.info("danger-enable-removing=false: moving to %s instead of deleting", target)
+                shutil.move(str(action.source_path), str(target))
+            else:
+                shutil.rmtree(action.source_path)
 
 
 def _log(action: PipelineAction, dry_run: bool) -> None:

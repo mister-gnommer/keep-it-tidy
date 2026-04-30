@@ -135,4 +135,4 @@ src/keep_it_tidy/
 
 ## TODOs
 
-- human review (`__main__` and `pipeline` done)
+- human review (`__main__`, `pipeline`, and `stage_*` files done)

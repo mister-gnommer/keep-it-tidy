@@ -39,7 +39,7 @@ class ClassifiedItem:
     age_in_days: int
 
 
-ActionType = Literal["stage-for-removal", "delete", "move-to-safe", "archive", "skip"]
+ActionType = Literal["stage-for-removal", "delete", "archive", "skip"]
 
 
 @dataclass

@@ -42,7 +42,7 @@ def test_recent_item_not_touched() -> None:
         assert len(actions) == 0
 
 
-def test_danger_disable_produces_move_to_safe() -> None:
+def test_danger_disable_still_produces_delete() -> None:
     with tempfile.TemporaryDirectory() as d:
         staging = Path(d) / "_to-remove"
         staging.mkdir()
@@ -50,9 +50,7 @@ def test_danger_disable_produces_move_to_safe() -> None:
 
         actions = plan(Path(d), _config(danger_enable_removing=False), datetime.now())
         assert len(actions) == 1
-        assert actions[0].type == "move-to-safe"
-        assert actions[0].target_path is not None
-        assert "_safe-to-remove" in str(actions[0].target_path)
+        assert actions[0].type == "delete"
 
 
 def test_missing_staging_dir_returns_empty() -> None:
@@ -61,11 +59,15 @@ def test_missing_staging_dir_returns_empty() -> None:
         assert len(actions) == 0
 
 
-def test_entries_without_date_prefix_skipped() -> None:
+def test_entry_without_date_prefix_gets_stamped() -> None:
     with tempfile.TemporaryDirectory() as d:
         staging = Path(d) / "_to-remove"
         staging.mkdir()
         (staging / "no-date-prefix.txt").write_text("x")
 
         actions = plan(Path(d), _config(), datetime.now())
-        assert len(actions) == 0
+        assert len(actions) == 1
+        assert actions[0].type == "stage-for-removal"
+        assert actions[0].target_path is not None
+        today = datetime.now().strftime("%Y-%m-%d")
+        assert actions[0].target_path.name == f"{today}_no-date-prefix.txt"

@@ -24,9 +24,13 @@ def run_pipeline(config: Config) -> list[PipelineAction]:
         classified = classify(items, config, now)
 
         stage_actions: list[PipelineAction] = []
+        
+        # Move removable items older than removable-main-sweep-ttl into _to-remove/.
         stage_actions.extend(plan_main_sweep(classified, config, watched_dir, now))
-        stage_actions.extend(plan_to_remove(watched_dir, config, now))
+        # Move standard items older than arch-main-sweep-ttl into _auto-arch/.
         stage_actions.extend(plan_auto_arch(classified, config, watched_dir))
+        # Delete (or safe-move) items that have sat in _to-remove/ past removable-remove-after.
+        stage_actions.extend(plan_to_remove(watched_dir, config, now))
 
         execute_pipeline_actions(stage_actions, config)
         actions_from_all_dirs.extend(stage_actions)

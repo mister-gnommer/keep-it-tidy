@@ -20,13 +20,18 @@ def plan(watched_dir: Path, config: Config, now: datetime) -> list[PipelineActio
         return actions
 
     for entry in entries:
-        match = _DATE_PREFIX.match(entry.name)
-        if not match:
-            continue
+        staged_date = _parse_staged_date(entry.name)
 
-        try:
-            staged_date = datetime.strptime(match.group(1), "%Y-%m-%d")
-        except ValueError:
+        if staged_date is None:
+            # No valid date prefix (missing or malformed) — stamp with today so
+            # TTL tracking starts from this run.
+            stamped = staging_dir / f"{now.strftime('%Y-%m-%d')}_{entry.name}"
+            actions.append(PipelineAction(
+                type="stage-for-removal",
+                source_path=entry,
+                target_path=stamped,
+                reason="missing or invalid date prefix in _to-remove/; stamped with today's date",
+            ))
             continue
 
         staged_age_days = (now - staged_date).days
@@ -38,24 +43,21 @@ def plan(watched_dir: Path, config: Config, now: datetime) -> list[PipelineActio
             f"{config.removable_remove_after}d"
         )
 
-        if config.danger_enable_removing:
-            actions.append(
-                PipelineAction(
-                    type="delete",
-                    source_path=entry,
-                    target_path=None,
-                    reason=reason,
-                )
-            )
-        else:
-            safe_dir = watched_dir / "_safe-to-remove"
-            actions.append(
-                PipelineAction(
-                    type="move-to-safe",
-                    source_path=entry,
-                    target_path=safe_dir / entry.name,
-                    reason=reason + " (danger-enable-removing=false)",
-                )
-            )
+        actions.append(PipelineAction(
+            type="delete",
+            source_path=entry,
+            target_path=None,
+            reason=reason,
+        ))
 
     return actions
+
+
+def _parse_staged_date(name: str) -> datetime | None:
+    match = _DATE_PREFIX.match(name)
+    if not match:
+        return None
+    try:
+        return datetime.strptime(match.group(1), "%Y-%m-%d")
+    except ValueError:
+        return None
