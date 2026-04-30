@@ -27,6 +27,7 @@ arch-main-sweep-ttl = 60
     assert config.dry_run is False
     assert config.enable_auto_arch is False
     assert config.dir_scan_file_limit == 10000
+    assert config.report_dir is None
 
 
 def test_missing_directories_raises() -> None:
@@ -96,6 +97,7 @@ enable-auto-arch = true
 enable-removing = false
 remove-all = true
 dir-scan-file-limit = 500
+report-dir = "/tmp/reports"
 """)
     config = load_config(path)
     assert config.directories == ["/home/user/Downloads", "/tmp"]
@@ -110,3 +112,4 @@ dir-scan-file-limit = 500
     assert config.enable_removing is False
     assert config.remove_all is True
     assert config.dir_scan_file_limit == 500
+    assert config.report_dir == Path("/tmp/reports")

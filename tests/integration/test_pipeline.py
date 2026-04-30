@@ -19,6 +19,7 @@ def _config(tmpdir: str, **overrides: object) -> Config:
         removable_remove_after=14,
         arch_main_sweep_ttl=60,
         dry_run=True,
+        report_dir=Path(tmpdir),
         enable_auto_arch=bool(overrides.get("enable_auto_arch", False)),
         ignore_pattern=list(overrides.get("ignore_pattern", [])),  # type: ignore[arg-type]
         danger_enable_removing=bool(overrides.get("danger_enable_removing", True)),

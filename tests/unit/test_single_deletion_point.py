@@ -61,11 +61,33 @@ def test_dry_run_prevents_move() -> None:
         assert not dest.exists(), "Destination should not exist in dry_run"
 
 
-def _config(*, dry_run: bool = False) -> Config:
+def test_danger_disable_moves_to_safe_instead_of_deleting() -> None:
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # source must be inside _to-remove/ so fs_ops can derive the safe dir
+        to_remove = Path(tmpdir) / "_to-remove"
+        to_remove.mkdir()
+        source = to_remove / "2026-01-01_old_file.txt"
+        source.write_text("x")
+
+        action = PipelineAction(
+            type="delete",
+            source_path=source,
+            target_path=None,
+            reason="test",
+        )
+        execute_pipeline_actions([action], _config(danger_enable_removing=False))
+
+        assert not source.exists(), "File should have been moved"
+        safe = Path(tmpdir) / "_safe-to-remove" / source.name
+        assert safe.exists(), "File should be in _safe-to-remove/"
+
+
+def _config(*, dry_run: bool = False, danger_enable_removing: bool = True) -> Config:
     return Config(
         directories=["/tmp"],
         removable_main_sweep_ttl=7,
         removable_remove_after=14,
         arch_main_sweep_ttl=60,
         dry_run=dry_run,
+        danger_enable_removing=danger_enable_removing,
     )
