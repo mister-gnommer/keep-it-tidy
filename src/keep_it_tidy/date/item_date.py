@@ -9,18 +9,16 @@ logger = logging.getLogger(__name__)
 
 def get_effective_date(
     path: Path,
-    is_directory: bool,
-    ignore_patterns: list[str],
     file_limit: int,
 ) -> datetime:
-    if not is_directory:
+    if not path.is_dir(follow_symlinks=False):
         return _file_date(path)
 
-    fallback_ts = path.stat().st_mtime
+    fallback_ts = _stat_ts(path.stat())
     best_ts = fallback_ts
     count = 0
 
-    for file_path in _iter_files(path, ignore_patterns):
+    for file_path in _iter_files(path):
         try:
             stat = file_path.stat()
         except OSError:
@@ -53,7 +51,7 @@ def _stat_ts(stat: os.stat_result) -> float:
     return mtime
 
 
-def _iter_files(root: Path, ignore_patterns: list[str]) -> Iterator[Path]:
+def _iter_files(root: Path) -> Iterator[Path]:
     try:
         with os.scandir(root) as scanner:
             entries = list(scanner)
@@ -61,9 +59,7 @@ def _iter_files(root: Path, ignore_patterns: list[str]) -> Iterator[Path]:
         return
 
     for entry in entries:
-        if any(p in entry.name for p in ignore_patterns):
-            continue
         if entry.is_dir(follow_symlinks=False):
-            yield from _iter_files(Path(entry.path), ignore_patterns)
+            yield from _iter_files(Path(entry.path))
         elif entry.is_file(follow_symlinks=False):
             yield Path(entry.path)

@@ -28,8 +28,8 @@ A `dry-run` mode makes no filesystem changes and writes a markdown report instea
 ### Item age
 
 The effective age of an item is determined by `max(mtime, birthtime)`. For directories,
-the freshest date among all descendant files is used (respecting `ignore-pattern` and
-capped by `dir-scan-file-limit` to avoid scanning huge trees like `node_modules`).
+the freshest date among all descendant files is used, capped by `dir-scan-file-limit`
+to avoid scanning huge trees.
 
 ### Special folders
 
@@ -135,4 +135,4 @@ src/keep_it_tidy/
 
 ## TODOs
 
-- human review (`__main__`, `pipeline`, and `stage_*` files done)
+- human review (`__main__`, `pipeline`, `stage_*`, `classifier`, and `item_date` done)

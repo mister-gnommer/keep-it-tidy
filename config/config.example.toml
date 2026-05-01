@@ -4,10 +4,11 @@
 # Absolute paths to directories to watch
 directories = ["/home/user/Downloads"]
 
-# Items whose name contains any of these strings are fully skipped,
-# including during recursive date scanning of parent directories.
+# Items whose name contains any of these strings are never processed —
+# not staged, not archived, not deleted. Use for things you want this
+# tool to leave completely alone (e.g. a folder you actively use).
 # Leave as empty list to disable.
-ignore-pattern = [".git", "node_modules"]
+ignore-pattern = []
 
 # Items whose name contains any of these strings are flagged as "removable".
 removable-pattern = ["_!tmp"]
@@ -43,6 +44,5 @@ enable-removing = true
 remove-all = false
 
 # Max files scanned inside a directory when computing its effective date.
-# Prevents slow scanning of huge trees (e.g. node_modules even if not in ignore-pattern).
-# Falls back to the directory's own mtime if the limit is hit.
+# Prevents slow scanning of huge trees. Falls back to the directory's own mtime if hit.
 dir-scan-file-limit = 10000

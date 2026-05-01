@@ -20,12 +20,7 @@ def scan(directory: Path, config: Config) -> list[ScannedItem]:
             is_dir = entry.is_dir(follow_symlinks=False)
         except OSError:
             continue
-        effective_date = get_effective_date(
-            entry,
-            is_dir,
-            config.ignore_pattern,
-            config.dir_scan_file_limit,
-        )
+        effective_date = get_effective_date(entry, config.dir_scan_file_limit)
         items.append(
             ScannedItem(
                 path=entry,
