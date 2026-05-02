@@ -44,7 +44,7 @@ def build_report(actions: list[PipelineAction], config: Config, now: datetime) -
     else:
         for action in actions:
             target = f" -> `{action.target_path}`" if action.target_path else ""
-            lines.append(f"- **{action.type}** `{action.source_path}`{target}")
+            lines.append(f"- **{action.type}** `{action.source_path}` -> {target}")
             lines.append(f"  _{action.reason}_")
 
     return "\n".join(lines) + "\n"

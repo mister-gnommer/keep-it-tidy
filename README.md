@@ -135,5 +135,5 @@ src/keep_it_tidy/
 
 ## TODOs
 
-- human review remaining: `report`, tests
+- human review remaining: unit tests
 - per-directory TTLs

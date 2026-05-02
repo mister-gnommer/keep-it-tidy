@@ -58,13 +58,13 @@ def test_standard_old_file_archived_when_enabled() -> None:
 
 def test_ignored_file_not_touched() -> None:
     with tempfile.TemporaryDirectory() as d:
-        f = Path(d) / "node_modules_backup_!tmp.txt"
+        f = Path(d) / "keep_me_backup_!tmp.txt"
         f.write_text("x")
         _age(f, 100)
 
-        actions = run_pipeline(_config(d, ignore_pattern=["node_modules"]))
+        actions = run_pipeline(_config(d, ignore_pattern=["keep_me"]))
         paths = [str(a.source_path) for a in actions]
-        assert not any("node_modules" in p for p in paths)
+        assert not any("keep_me" in p for p in paths)
 
 
 def test_staged_old_item_deleted() -> None:
@@ -77,6 +77,27 @@ def test_staged_old_item_deleted() -> None:
 
         actions = run_pipeline(_config(d))
         assert any(a.type == "delete" for a in actions)
+
+
+def test_live_run_actually_moves_file() -> None:
+    with tempfile.TemporaryDirectory() as d:
+        f = Path(d) / "old_!tmp.txt"
+        f.write_text("x")
+        _age(f, 10)
+
+        config = Config(
+            directories=[d],
+            removable_main_sweep_ttl=7,
+            removable_remove_after=14,
+            arch_main_sweep_ttl=60,
+            dry_run=False,
+            report_dir=Path(d),
+        )
+        run_pipeline(config)
+
+        assert not f.exists(), "File should have been moved to _to-remove/"
+        staged = list((Path(d) / "_to-remove").glob("*old_!tmp.txt"))
+        assert staged, "File should be in _to-remove/"
 
 
 def test_dry_run_makes_no_filesystem_changes() -> None:
