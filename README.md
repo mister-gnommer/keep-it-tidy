@@ -135,4 +135,5 @@ src/keep_it_tidy/
 
 ## TODOs
 
-- human review (`__main__`, `pipeline`, `stage_*`, `classifier`, and `item_date` done)
+- human review remaining: `report`, tests
+- per-directory TTLs
